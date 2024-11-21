@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/inicio"
+            android:title="Inicio" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/establecimiento"
+            android:title="Informacion por establecimientos"/>
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@drawable/cccc"
+            android:title="Contacto y ayuda" />
+        <item
+            android:id="@+id/nav_Insert"
+            android:icon="@drawable/cccc"
+            android:title="Insertar" />
+        <item
+            android:id="@+id/nav_Uni"
+            android:icon="@drawable/establecimiento"
+            android:title="Universidades" />
+        <item
+            android:id="@+id/nav_Colegio"
+            android:icon="@drawable/establecimiento"
+            android:title="Colegios" />
+        <item
+            android:id="@+id/nav_Instituto"
+            android:icon="@drawable/establecimiento"
+            android:title="Instituto" />
+        <item
+            android:id="@+id/nav_Modificar"
+            android:icon="@drawable/establecimiento"
+            android:title="Modificar" />
+        <item
+            android:id="@+id/nav_Favoritos"
+            android:icon="@drawable/baseline_star_rate_24"
+            android:title="Favoritos" />
+
+    </group>
+</menu>
