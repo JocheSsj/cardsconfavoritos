@@ -2,6 +2,8 @@ package com.example.menuapp;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -47,33 +49,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void cargarMarcadoresDesdeFirebase() {
-        // Instancia de Firebase Database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference locationsRef = database.getReference("Establecimientos");
 
-        // Leer los datos de Firebase
         locationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
                     try {
-                        // Leer los datos de cada establecimiento
                         double latitude = locationSnapshot.child("latitud").getValue(Double.class);
                         double longitude = locationSnapshot.child("longitud").getValue(Double.class);
                         String name = locationSnapshot.child("nombre").getValue(String.class);
-                        String type = locationSnapshot.child("tipo").getValue(String.class); // Tipo del establecimiento
+                        String type = locationSnapshot.child("idTipoEsta").getValue(String.class); // Tipo del establecimiento
 
                         // Personalizar el marcador según el tipo
                         BitmapDescriptor icon;
-                        if ("universidad".equals(type)) {
-                            icon = BitmapDescriptorFactory.fromResource(R.drawable.mar);
+                        if ("Universidad".equals(type)) {
+                            Bitmap smallMarker = resizeBitmap("unimarket", 80, 80); // Ajusta el tamaño del ícono
+                            icon = BitmapDescriptorFactory.fromBitmap(smallMarker);
                         } else if ("Colegio".equals(type)) {
-                            icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_cafe);
-                        }else if ("Instituto".equals(type)) {
-                            icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_cafe);
-                        }
-                        else {
-                            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE); // Marcador predeterminado
+                            Bitmap smallMarker = resizeBitmap("colegiomarket", 80, 80);
+                            icon = BitmapDescriptorFactory.fromBitmap(smallMarker);
+                        } else if ("Instituto".equals(type)) {
+                            Bitmap smallMarker = resizeBitmap("institutomarket", 80, 80);
+                            icon = BitmapDescriptorFactory.fromBitmap(smallMarker);
+                        } else {
+                            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN); // Marcador predeterminado
                         }
 
                         // Agregar el marcador al mapa
@@ -102,5 +103,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.e("Firebase", "Error al leer los datos", databaseError.toException());
             }
         });
+    }
+
+    private Bitmap resizeBitmap(String drawableName, int width, int height) {
+        int resourceId = getResources().getIdentifier(drawableName, "drawable", getPackageName());
+        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), resourceId);
+        return Bitmap.createScaledBitmap(imageBitmap, width, height, false);
     }
 }
