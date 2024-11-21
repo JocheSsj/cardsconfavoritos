@@ -10,6 +10,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -47,16 +48,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Agregar primer marcador con una imagen personalizada
-        Bitmap imagenMarcador = BitmapFactory.decodeResource(getResources(), R.drawable.santomarket);
         LatLng SantoTomas = new LatLng(-29.908632, -71.257537);
+        Bitmap imagenMarcador = BitmapFactory.decodeResource(getResources(), R.drawable.santomarket);
+
+        // Redimensionar el bitmap a un tamaño más adecuado
+        int anchoDeseado = 100; // Ajusta el ancho en píxeles
+        int altoDeseado = 100;  // Ajusta el alto en píxeles
+        Bitmap imagenRedimensionada = Bitmap.createScaledBitmap(imagenMarcador, anchoDeseado, altoDeseado, false);
+
+        // Convertir la imagen redimensionada en un BitmapDescriptor
+        BitmapDescriptor iconoPersonalizado = BitmapDescriptorFactory.fromBitmap(imagenRedimensionada);
+
         MarkerOptions opcionesMarcadorSantoTomas = new MarkerOptions()
                 .position(SantoTomas)
                 .title("Universidad Santo Tomas")
                 .snippet("Ruta 5, Universidad\nUniversidad Santo Tomas inscritos a la gratuitas")
-                .icon(BitmapDescriptorFactory.fromBitmap(imagenMarcador));
+                .icon(iconoPersonalizado)
+                .anchor(0.5f, 1.0f); // Centrar horizontalmente y anclar en la base
 
+        // Agregar el marcador al mapa
         mMap.addMarker(opcionesMarcadorSantoTomas);
-
         // Agregar un segundo marcador
         LatLng Inacap = new LatLng(-29.915682, -71.250084);
         MarkerOptions opcionesMarcadorInacap = new MarkerOptions()

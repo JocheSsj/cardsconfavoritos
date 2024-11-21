@@ -12,7 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MenuApp"
         tools:targetApi="31">
-
+        <activity
+            android:name=".FavoritosVista"
+            android:exported="false" />
+        <activity
+            android:name=".Favoritos"
+            android:exported="false" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -27,11 +32,11 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyD_AFdZk30EawoxzbcTP5j5bxc-J-KPt3s" />
+
         <activity
             android:name=".MapsActivity"
             android:exported="false"
             android:label="@string/title_activity_maps" />
-
         <activity
             android:name=".Detalles"
             android:exported="false" />

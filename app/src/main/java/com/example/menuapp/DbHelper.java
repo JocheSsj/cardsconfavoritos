@@ -151,6 +151,29 @@ public class DbHelper  extends SQLiteOpenHelper {
         db.close();
         return filasAfectadas;
     }
+    public List<Favoritos> obtenerFavoritos() {
+        List<Favoritos> lista = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM tabla_establecimento WHERE Favorito = '1'", null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                lista.add(new Favoritos(
+                        cursor.getInt(0),
+                        cursor.getString(1),
+                        cursor.getString(2),
+                        cursor.getString(3),
+                        cursor.getString(4),
+                        cursor.getString(5),
+                        cursor.getInt(6),
+                        cursor.getString(7),
+                        cursor.getString(8)
+                ));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return lista;
+    }
 
 
 

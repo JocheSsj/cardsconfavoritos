@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             }else if (id == R.id.nav_Favoritos) {
-                Intent intent = new Intent(MainActivity.this, UpdateActivity.class);
+                Intent intent = new Intent(MainActivity.this, FavoritosVista.class);
                 startActivity(intent);
                 return true;
             }else if (id == R.id.nav_Mapa) {
