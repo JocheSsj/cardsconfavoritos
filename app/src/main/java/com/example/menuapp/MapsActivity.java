@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentActivity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -15,6 +16,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.menuapp.databinding.ActivityMapsBinding;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -28,67 +34,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        // Obtener el SupportMapFragment y notificar cuando el mapa esté listo
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Agregar primer marcador con una imagen personalizada
-        LatLng SantoTomas = new LatLng(-29.908632, -71.257537);
-        Bitmap imagenMarcador = BitmapFactory.decodeResource(getResources(), R.drawable.santomarket);
+        // Llama al método para cargar los marcadores desde Firebase
+        cargarMarcadoresDesdeFirebase();
+    }
 
-        // Redimensionar el bitmap a un tamaño más adecuado
-        int anchoDeseado = 100; // Ajusta el ancho en píxeles
-        int altoDeseado = 100;  // Ajusta el alto en píxeles
-        Bitmap imagenRedimensionada = Bitmap.createScaledBitmap(imagenMarcador, anchoDeseado, altoDeseado, false);
+    private void cargarMarcadoresDesdeFirebase() {
+        // Instancia de Firebase Database
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference locationsRef = database.getReference("Establecimientos");
 
-        // Convertir la imagen redimensionada en un BitmapDescriptor
-        BitmapDescriptor iconoPersonalizado = BitmapDescriptorFactory.fromBitmap(imagenRedimensionada);
+        // Leer los datos de Firebase
+        locationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                    try {
+                        double latitude = locationSnapshot.child("latitud").getValue(Double.class);
+                        double longitude = locationSnapshot.child("longitud").getValue(Double.class);
+                        String name = locationSnapshot.child("nombre").getValue(String.class);
 
-        MarkerOptions opcionesMarcadorSantoTomas = new MarkerOptions()
-                .position(SantoTomas)
-                .title("Universidad Santo Tomas")
-                .snippet("Ruta 5, Universidad\nUniversidad Santo Tomas inscritos a la gratuitas")
-                .icon(iconoPersonalizado)
-                .anchor(0.5f, 1.0f); // Centrar horizontalmente y anclar en la base
+                        // Agrega el marcador al mapa
+                        LatLng position = new LatLng(latitude, longitude);
+                        mMap.addMarker(new MarkerOptions()
+                                .position(position)
+                                .title(name));
+                    } catch (Exception e) {
+                        Log.e("Firebase", "Error al procesar los datos", e);
+                    }
+                }
 
-        // Agregar el marcador al mapa
-        mMap.addMarker(opcionesMarcadorSantoTomas);
-        // Agregar un segundo marcador
-        LatLng Inacap = new LatLng(-29.915682, -71.250084);
-        MarkerOptions opcionesMarcadorInacap = new MarkerOptions()
-                .position(Inacap)
-                .title("INACAP La Serena")
-                .snippet("Dirección: Av. Francisco de Aguirre, La Serena")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)); // Marcador azul predeterminado
+                // Centrar la cámara en el primer punto (opcional)
+                if (dataSnapshot.getChildrenCount() > 0) {
+                    DataSnapshot firstLocation = dataSnapshot.getChildren().iterator().next();
+                    double latitude = firstLocation.child("latitud").getValue(Double.class);
+                    double longitude = firstLocation.child("longitud").getValue(Double.class);
+                    LatLng firstPosition = new LatLng(latitude, longitude);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstPosition, 13));
+                }
+            }
 
-        mMap.addMarker(opcionesMarcadorInacap);
-
-        // Agregar un tercer marcador
-        LatLng Colegio = new LatLng(-29.920492, -71.253876);
-        MarkerOptions opcionesMarcadorColegio = new MarkerOptions()
-                .position(Colegio)
-                .title("Colegio Inglés Católico")
-                .snippet("Dirección: Calle Los Arrayanes, La Serena")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)); // Marcador rojo predeterminado
-
-        mMap.addMarker(opcionesMarcadorColegio);
-
-        // Mover la cámara para mostrar el primer marcador
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SantoTomas, 13)); // Zoom inicial para visualizar todos los marcadores
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("Firebase", "Error al leer los datos", databaseError.toException());
+            }
+        });
     }
 }
