@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "511633218224",
+    "firebase_url": "https://androidlol-82d43-default-rtdb.firebaseio.com",
+    "project_id": "androidlol-82d43",
+    "storage_bucket": "androidlol-82d43.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:511633218224:android:8f21a2b527326e68e2b975",
+        "android_client_info": {
+          "package_name": "com.example.menuapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGuvmn1_5mqiQDHiM1O67DjlLEvrn8LRc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

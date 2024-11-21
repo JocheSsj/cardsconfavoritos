@@ -2,8 +2,6 @@ package com.example.menuapp;
 
 import androidx.fragment.app.FragmentActivity;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -59,15 +57,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
                     try {
+                        // Leer los datos de cada establecimiento
                         double latitude = locationSnapshot.child("latitud").getValue(Double.class);
                         double longitude = locationSnapshot.child("longitud").getValue(Double.class);
                         String name = locationSnapshot.child("nombre").getValue(String.class);
+                        String type = locationSnapshot.child("tipo").getValue(String.class); // Tipo del establecimiento
 
-                        // Agrega el marcador al mapa
+                        // Personalizar el marcador según el tipo
+                        BitmapDescriptor icon;
+                        if ("universidad".equals(type)) {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.mar);
+                        } else if ("Colegio".equals(type)) {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_cafe);
+                        }else if ("Instituto".equals(type)) {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_cafe);
+                        }
+                        else {
+                            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE); // Marcador predeterminado
+                        }
+
+                        // Agregar el marcador al mapa
                         LatLng position = new LatLng(latitude, longitude);
                         mMap.addMarker(new MarkerOptions()
                                 .position(position)
-                                .title(name));
+                                .title(name)
+                                .icon(icon));
                     } catch (Exception e) {
                         Log.e("Firebase", "Error al procesar los datos", e);
                     }
