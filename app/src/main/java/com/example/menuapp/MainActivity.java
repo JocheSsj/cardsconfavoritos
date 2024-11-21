@@ -81,6 +81,10 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, UpdateActivity.class);
                 startActivity(intent);
                 return true;
+            }else if (id == R.id.nav_Mapa) {
+                Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                startActivity(intent);
+                return true;
             }
 
             // Usar el controlador de navegación para manejar otros casos
