@@ -15,9 +15,15 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
 
 import com.example.menuapp.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationView;
+
 
 public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
@@ -31,6 +37,18 @@ public class MainActivity extends AppCompatActivity {
         // Configuración de ViewBinding
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Inicializa Firebase Database
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("PruebaAndroid");
+
+        myRef.setValue("Conexión exitosa").addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(MainActivity.this, "Conectado a Firebase", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(MainActivity.this, "Error al conectar con Firebase", Toast.LENGTH_LONG).show();
+            }
+        });
 
         // Configuración de la barra de herramientas
         setSupportActionBar(binding.appBarMain.toolbar);
