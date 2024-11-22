@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.firebase.database)
     // Glide para manejar imágenes
     implementation("com.github.bumptech.glide:glide:4.15.1")
+    implementation(libs.firebase.firestore)
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
 
     testImplementation(libs.junit)

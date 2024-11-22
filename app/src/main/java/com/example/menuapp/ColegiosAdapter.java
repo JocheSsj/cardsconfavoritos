@@ -1,5 +1,6 @@
 package com.example.menuapp;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +60,13 @@ public class ColegiosAdapter extends RecyclerView.Adapter<ColegiosAdapter.ViewHo
             // Guardar el cambio en la base de datos
             DbHelper dbHelper = new DbHelper(holder.itemView.getContext());
             dbHelper.actualizarFavorito(colegio.getId(), colegio.getFavorito());
+        });
+
+        // Manejar clic en el botón "Ver Más"
+        holder.itemView.findViewById(R.id.btnmas).setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), Detalles.class);
+            intent.putExtra("nombre", colegio.getNombre()); // Enviar nombre al DetallesActivity
+            holder.itemView.getContext().startActivity(intent);
         });
     }
 
