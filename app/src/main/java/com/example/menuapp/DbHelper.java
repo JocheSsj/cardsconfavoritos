@@ -58,29 +58,7 @@ public class DbHelper  extends SQLiteOpenHelper {
         db.close();
         return id;
     }
-    public List<Establecimiento> obtenerEstablecimientos() {
-        List<Establecimiento> lista = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM tabla_establecimento WHERE Tipo = 'Universidad'", null);
 
-        if (cursor.moveToFirst()) {
-            do {
-                lista.add(new Establecimiento(
-                        cursor.getInt(0),
-                        cursor.getString(1),
-                        cursor.getString(2),
-                        cursor.getString(3),
-                        cursor.getString(4),
-                        cursor.getString(5),
-                        cursor.getInt(6),
-                        cursor.getString(7),
-                        cursor.getString(8)
-                ));
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        return lista;
-    }
     public List<Institutos> obtenerInstitutos() {
         List<Institutos> lista = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
