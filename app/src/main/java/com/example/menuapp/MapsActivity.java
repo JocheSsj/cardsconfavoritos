@@ -2,6 +2,7 @@ package com.example.menuapp;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -21,93 +22,45 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private ActivityMapsBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps); // Asegúrate de usar el nombre correcto del layout
 
-        binding = ActivityMapsBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        // Obtener el SupportMapFragment y notificar cuando el mapa esté listo
+        // Obtener el fragmento del mapa
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Llama al método para cargar los marcadores desde Firebase
-        cargarMarcadoresDesdeFirebase();
-    }
+        // Obtener datos enviados desde Detalles.java
+        Intent intent = getIntent();
+        double latitud = intent.getDoubleExtra("latitud", 0);
+        double longitud = intent.getDoubleExtra("longitud", 0);
+        String nombre = intent.getStringExtra("nombre");
+        String direccion = intent.getStringExtra("direccion");
 
-    private void cargarMarcadoresDesdeFirebase() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference locationsRef = database.getReference("Establecimientos");
+        // Crear la ubicación seleccionada
+        LatLng ubicacionSeleccionada = new LatLng(latitud, longitud);
 
-        locationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
-                    try {
-                        double latitude = locationSnapshot.child("latitud").getValue(Double.class);
-                        double longitude = locationSnapshot.child("longitud").getValue(Double.class);
-                        String name = locationSnapshot.child("nombre").getValue(String.class);
-                        String type = locationSnapshot.child("idTipoEsta").getValue(String.class); // Tipo del establecimiento
+        // Agregar un marcador único para el establecimiento seleccionado
+        mMap.addMarker(new MarkerOptions()
+                .position(ubicacionSeleccionada)
+                .title(nombre)
+                .snippet("Dirección: " + direccion)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
 
-                        // Personalizar el marcador según el tipo
-                        BitmapDescriptor icon;
-                        if ("Universidad".equals(type)) {
-                            Bitmap smallMarker = resizeBitmap("unimarket", 60, 60); // Ajusta el tamaño del ícono
-                            icon = BitmapDescriptorFactory.fromBitmap(smallMarker);
-                        } else if ("Colegio".equals(type)) {
-                            Bitmap smallMarker = resizeBitmap("colegiomarket", 60, 60);
-                            icon = BitmapDescriptorFactory.fromBitmap(smallMarker);
-                        } else if ("Instituto".equals(type)) {
-                            Bitmap smallMarker = resizeBitmap("institutomarket", 60, 60);
-                            icon = BitmapDescriptorFactory.fromBitmap(smallMarker);
-                        } else {
-                            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN); // Marcador predeterminado
-                        }
-
-                        // Agregar el marcador al mapa
-                        LatLng position = new LatLng(latitude, longitude);
-                        mMap.addMarker(new MarkerOptions()
-                                .position(position)
-                                .title(name)
-                                .icon(icon));
-                    } catch (Exception e) {
-                        Log.e("Firebase", "Error al procesar los datos", e);
-                    }
-                }
-
-                // Centrar la cámara en el primer punto (opcional)
-                if (dataSnapshot.getChildrenCount() > 0) {
-                    DataSnapshot firstLocation = dataSnapshot.getChildren().iterator().next();
-                    double latitude = firstLocation.child("latitud").getValue(Double.class);
-                    double longitude = firstLocation.child("longitud").getValue(Double.class);
-                    LatLng firstPosition = new LatLng(latitude, longitude);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstPosition, 13));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("Firebase", "Error al leer los datos", databaseError.toException());
-            }
-        });
-    }
-
-    private Bitmap resizeBitmap(String drawableName, int width, int height) {
-        int resourceId = getResources().getIdentifier(drawableName, "drawable", getPackageName());
-        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), resourceId);
-        return Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+        // Centrar el mapa en el marcador y hacer zoom
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ubicacionSeleccionada, 17));
     }
 }

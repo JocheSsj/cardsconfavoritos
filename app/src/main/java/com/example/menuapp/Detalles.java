@@ -1,9 +1,10 @@
 package com.example.menuapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,8 +16,11 @@ import com.google.firebase.database.ValueEventListener;
 
 public class Detalles extends AppCompatActivity {
 
-    private TextView tvDetalles; // TextView para mostrar los resultados
+    private TextView tvDetalles;
+    private Button btnVerUbicacion;
     private DatabaseReference db;
+    private double latitud, longitud;
+    private String direccion, nombre;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,14 +30,29 @@ public class Detalles extends AppCompatActivity {
         // Inicializar Firebase Realtime Database
         db = FirebaseDatabase.getInstance().getReference("Establecimientos");
 
-        // Obtener referencias al TextView
+        // Referencias de UI
         tvDetalles = findViewById(R.id.tvDetalles);
+        btnVerUbicacion = findViewById(R.id.btnVerUbicacion);
 
         // Obtener el ID enviado desde el intent
         String id = getIntent().getStringExtra("id");
 
-        // Consultar datos desde Firebase según el ID
+        // Cargar los datos del establecimiento
         cargarDatosDesdeFirebase(id);
+
+        // Configurar el botón "Ver Ubicación"
+        btnVerUbicacion.setOnClickListener(v -> {
+            if (latitud != 0 && longitud != 0 && direccion != null && nombre != null) {
+                Intent intent = new Intent(Detalles.this, MapsActivity.class);
+                intent.putExtra("latitud", latitud);
+                intent.putExtra("longitud", longitud);
+                intent.putExtra("nombre", nombre);
+                intent.putExtra("direccion", direccion);
+                startActivity(intent);
+            } else {
+                Log.e("Detalles", "Datos incompletos: latitud=" + latitud + ", longitud=" + longitud + ", direccion=" + direccion);
+            }
+        });
     }
 
     private void cargarDatosDesdeFirebase(String id) {
@@ -43,17 +62,14 @@ public class Detalles extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    // Construir los detalles a partir de los datos recuperados
-                    StringBuilder detalles = new StringBuilder();
+                    // Recuperar datos del establecimiento
+                    nombre = snapshot.child("nombre").getValue(String.class);
+                    direccion = snapshot.child("direccion").getValue(String.class);
+                    latitud = snapshot.child("latitud").getValue(Double.class);
+                    longitud = snapshot.child("longitud").getValue(Double.class);
 
-                    detalles.append("Nombre: ").append(snapshot.child("nombre").getValue(String.class)).append("\n");
-                    detalles.append("Dirección: ").append(snapshot.child("direccion").getValue(String.class)).append("\n");
-                    detalles.append("Tipo de Establecimiento: ").append(snapshot.child("idTipoEsta").getValue(String.class)).append("\n");
-                    detalles.append("Descripción: ").append(snapshot.child("descripcion").getValue(String.class)).append("\n");
-                    detalles.append("Teléfono: ").append(snapshot.child("telefono").getValue(String.class)).append("\n");
-
-                    // Mostrar los detalles en el TextView
-                    tvDetalles.setText(detalles.toString());
+                    // Mostrar los datos en el TextView
+                    tvDetalles.setText("Nombre: " + nombre + "\nDirección: " + direccion);
                 } else {
                     Log.d("Detalles", "No se encontró un establecimiento con el ID: " + id);
                     tvDetalles.setText("No se encontraron datos.");
