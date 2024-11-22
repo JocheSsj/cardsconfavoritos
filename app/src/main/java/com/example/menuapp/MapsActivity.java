@@ -65,13 +65,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         // Personalizar el marcador según el tipo
                         BitmapDescriptor icon;
                         if ("Universidad".equals(type)) {
-                            Bitmap smallMarker = resizeBitmap("unimarket", 80, 80); // Ajusta el tamaño del ícono
+                            Bitmap smallMarker = resizeBitmap("unimarket", 60, 60); // Ajusta el tamaño del ícono
                             icon = BitmapDescriptorFactory.fromBitmap(smallMarker);
                         } else if ("Colegio".equals(type)) {
-                            Bitmap smallMarker = resizeBitmap("colegiomarket", 80, 80);
+                            Bitmap smallMarker = resizeBitmap("colegiomarket", 60, 60);
                             icon = BitmapDescriptorFactory.fromBitmap(smallMarker);
                         } else if ("Instituto".equals(type)) {
-                            Bitmap smallMarker = resizeBitmap("institutomarket", 80, 80);
+                            Bitmap smallMarker = resizeBitmap("institutomarket", 60, 60);
                             icon = BitmapDescriptorFactory.fromBitmap(smallMarker);
                         } else {
                             icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN); // Marcador predeterminado
