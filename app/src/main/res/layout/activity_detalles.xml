@@ -7,8 +7,8 @@
 
     <TextView
         android:id="@+id/tvDetalles"
-        android:layout_width="395dp"
-        android:layout_height="485dp"
+        android:layout_width="383dp"
+        android:layout_height="509dp"
         android:lineSpacingExtra="10sp"
         android:text="Detalles"
         android:textSize="22sp" />

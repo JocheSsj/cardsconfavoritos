@@ -1,6 +1,7 @@
 package com.example.menuapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,7 +27,7 @@ public class GeneralAdapter extends RecyclerView.Adapter<GeneralAdapter.ViewHold
     private DatabaseReference databaseReference;
     private Context context;
 
-    public GeneralAdapter(Context context) {
+    public GeneralAdapter() {
         this.context = context;
         this.establecimientoList = new ArrayList<>();
         this.databaseReference = FirebaseDatabase.getInstance().getReference("Establecimientos");
@@ -40,7 +40,7 @@ public class GeneralAdapter extends RecyclerView.Adapter<GeneralAdapter.ViewHold
                 establecimientoList.clear(); // Limpiar lista antes de agregar nuevos datos
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Establecimiento establecimiento = dataSnapshot.getValue(Establecimiento.class); // Convertir nodo en objeto Establecimiento
-                    if (establecimiento != null && establecimiento.getFavorito() == 1) { // Filtrar solo los favoritos
+                    if (establecimiento != null) { // Verificar que no sea nulo
                         establecimiento.setId(dataSnapshot.getKey()); // Asignar la clave única al objeto
                         establecimientoList.add(establecimiento); // Agregar a la lista
                     }
@@ -53,7 +53,9 @@ public class GeneralAdapter extends RecyclerView.Adapter<GeneralAdapter.ViewHold
                 // Manejar errores si es necesario
             }
         });
+
     }
+
 
 
 
@@ -92,6 +94,14 @@ public class GeneralAdapter extends RecyclerView.Adapter<GeneralAdapter.ViewHold
 
             // Actualizar en Firebase
             databaseReference.child(establecimiento.getId()).child("favorito").setValue(establecimiento.getFavorito());
+        });
+        holder.itemView.findViewById(R.id.btnmas).setOnClickListener(v -> {
+            String idEstablecimiento = establecimiento.getId(); // Usar la clave única
+
+            // Iniciar la actividad Detalles y enviar el ID del establecimiento
+            Intent intent = new Intent(holder.itemView.getContext(), Detalles.class);
+            intent.putExtra("id", idEstablecimiento); // Enviar la clave única del establecimiento
+            holder.itemView.getContext().startActivity(intent);
         });
     }
 

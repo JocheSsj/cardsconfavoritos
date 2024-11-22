@@ -33,13 +33,6 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer"
-        style="@style/NavViewStyle">
-
-        <Button
-            android:id="@+id/btnCrear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Crear" />
-    </com.google.android.material.navigation.NavigationView>
+        style="@style/NavViewStyle"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

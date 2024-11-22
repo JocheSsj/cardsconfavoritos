@@ -56,7 +56,12 @@ public class MainActivity extends AppCompatActivity {
         // Redirigir desde textView4 a PuntosActivity
         TextView textView4 = findViewById(R.id.textView4);
         textView4.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, PuntosActivity.class);
+            Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+            startActivity(intent);
+        });
+        TextView textView5 = findViewById(R.id.textView5);
+        textView5.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, GeneralVista.class);
             startActivity(intent);
         });
 
@@ -99,8 +104,9 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, FavoritosVista.class);
                 startActivity(intent);
                 return true;
-            }else if (id == R.id.nav_Mapa) {
-                Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+            }
+            else if (id == R.id.nav_gallery) {
+                Intent intent = new Intent(MainActivity.this, GeneralVista.class);
                 startActivity(intent);
                 return true;
             }
@@ -111,16 +117,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Configurar botón para crear la base de datos
-        btnCrear = findViewById(R.id.btnCrear);
-        btnCrear.setOnClickListener(view -> {
-            DbHelper dbHelper = new DbHelper(MainActivity.this);
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-            if (db != null) {
-                Toast.makeText(MainActivity.this, "Base de datos creada", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(MainActivity.this, "Error al crear la base de datos", Toast.LENGTH_LONG).show();
-            }
-        });
+
+
     }
 
     @Override

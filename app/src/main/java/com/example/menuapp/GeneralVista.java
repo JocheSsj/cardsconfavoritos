@@ -14,13 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 public class GeneralVista extends AppCompatActivity {
 
     RecyclerView recyclerView;
-    InstitutoAdapter adapter;
+    GeneralAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_general_vista;
+        setContentView(R.layout.activity_general_vista);
 
         // Configurar ajustes de diseño para manejar insets
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
