@@ -21,13 +21,13 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FavoritosAdapter extends RecyclerView.Adapter<FavoritosAdapter.ViewHolder> {
+public class GeneralAdapter extends RecyclerView.Adapter<GeneralAdapter.ViewHolder> {
 
     private List<Establecimiento> establecimientoList;
     private DatabaseReference databaseReference;
     private Context context;
 
-    public FavoritosAdapter(Context context) {
+    public GeneralAdapter(Context context) {
         this.context = context;
         this.establecimientoList = new ArrayList<>();
         this.databaseReference = FirebaseDatabase.getInstance().getReference("Establecimientos");

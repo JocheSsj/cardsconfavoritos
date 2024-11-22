@@ -13,6 +13,21 @@
         android:theme="@style/Theme.MenuApp"
         tools:targetApi="31">
         <activity
+            android:name=".GeneralVista"
+            android:exported="false" />
+        <activity
+            android:name=".General"
+            android:exported="false" />
+        <activity
+            android:name=".Busqueda"
+            android:exported="false" />
+        <activity
+            android:name=".BecasActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CarrerasActivity"
+            android:exported="false" />
+        <activity
             android:name=".FavoritosVista"
             android:exported="false" />
         <activity
