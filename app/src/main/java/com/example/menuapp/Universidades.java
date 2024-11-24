@@ -21,7 +21,7 @@ public class Universidades extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_universidades);
 
-        // Configurar ajustes de diseño para manejar insets
+        //  ajustes de diseño para manejar insets
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -32,8 +32,8 @@ public class Universidades extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Usar el adaptador que carga datos desde Firebase
-        adapter = new EstablecimientoAdapter(); // Constructor por defecto
+        //  carga datos desde Firebase
+        adapter = new EstablecimientoAdapter();
         recyclerView.setAdapter(adapter);
     }
 }

@@ -72,15 +72,13 @@ public class CarrerasActivity extends AppCompatActivity {
                         if (pertenece) {
                             // Recuperar los datos de la carrera
                             String nombreCarrera = carreraSnapshot.child("nombre").getValue(String.class);
-                            String linkMasInformacion = carreraSnapshot.child("linkMasInformacion").getValue(String.class);
                             int arancel = carreraSnapshot.child("arancel").getValue(Integer.class);
                             int matricula = carreraSnapshot.child("matricula").getValue(Integer.class);
 
                             // Concatenar los datos en una sola cadena para mostrar en la lista
                             String carreraInfo = "Nombre: " + nombreCarrera + "\n" +
                                     "Arancel: $" + arancel + "\n" +
-                                    "Matrícula: " + matricula + "\n" +
-                                    "Más información: " + linkMasInformacion;
+                                    "Matrícula: " + matricula + "\n";
 
                             carrerasList.add(carreraInfo); // Agregar la cadena a la lista
                         }

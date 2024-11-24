@@ -17,7 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Fragmento del mapa -->
     <ImageButton
         android:id="@+id/btnSalirMapa"
         android:layout_width="59dp"

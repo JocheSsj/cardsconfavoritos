@@ -17,10 +17,6 @@
             android:icon="@drawable/cccc"
             android:title="Contacto y ayuda" />
         <item
-            android:id="@+id/nav_Insert"
-            android:icon="@drawable/cccc"
-            android:title="Insertar" />
-        <item
             android:id="@+id/nav_Uni"
             android:icon="@drawable/establecimiento"
             android:title="Universidades" />
@@ -33,13 +29,13 @@
             android:icon="@drawable/establecimiento"
             android:title="Instituto" />
         <item
-            android:id="@+id/nav_Modificar"
-            android:icon="@drawable/establecimiento"
-            android:title="Modificar" />
-        <item
             android:id="@+id/nav_Favoritos"
             android:icon="@drawable/baseline_star_rate_24"
             android:title="Favoritos" />
+        <item
+            android:id="@+id/nav_busqueda"
+            android:icon="@drawable/busqueda"
+            android:title="Búsqueda y Filtrado" />
 
 
     </group>

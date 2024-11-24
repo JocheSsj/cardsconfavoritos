@@ -80,11 +80,7 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
 
-            if (id == R.id.nav_Insert) {
-                Intent intent = new Intent(MainActivity.this, InsertActivity.class);
-                startActivity(intent);
-                return true;
-            } else if (id == R.id.nav_Uni) {
+            if (id == R.id.nav_Uni) {
                 Intent intent = new Intent(MainActivity.this, Universidades.class);
                 startActivity(intent);
                 return true;
@@ -96,12 +92,13 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, ColegioVista.class);
                 startActivity(intent);
                 return true;
-            }else if (id == R.id.nav_Modificar) {
-                Intent intent = new Intent(MainActivity.this, UpdateActivity.class);
+            }
+            else if (id == R.id.nav_Favoritos) {
+                Intent intent = new Intent(MainActivity.this, FavoritosVista.class);
                 startActivity(intent);
                 return true;
-            }else if (id == R.id.nav_Favoritos) {
-                Intent intent = new Intent(MainActivity.this, FavoritosVista.class);
+            }else if (id == R.id.nav_busqueda) {
+                Intent intent = new Intent(MainActivity.this, BusquedaFiltradoActivity.class);
                 startActivity(intent);
                 return true;
             }
@@ -116,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                     || super.onOptionsItemSelected(item);
         });
 
-        // Configurar botón para crear la base de datos
+
 
 
     }

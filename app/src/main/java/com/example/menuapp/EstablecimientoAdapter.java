@@ -49,7 +49,7 @@ public class EstablecimientoAdapter extends RecyclerView.Adapter<Establecimiento
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        // Manejar errores si es necesario
+
                     }
                 });
     }
@@ -79,7 +79,7 @@ public class EstablecimientoAdapter extends RecyclerView.Adapter<Establecimiento
                         : R.drawable.vaciastar_24
         );
 
-        // Manejar clic en el botón favorito
+        //  clic en el botón favorito
         holder.btnFavorito.setOnClickListener(v -> {
             boolean esFavorito = establecimiento.getFavorito() == 1;
 
@@ -96,7 +96,7 @@ public class EstablecimientoAdapter extends RecyclerView.Adapter<Establecimiento
             databaseReference.child(establecimiento.getId()).child("favorito").setValue(establecimiento.getFavorito());
         });
 
-        // Manejar clic en el botón "Ver Más"
+        // clic en el botón "Ver Más"
         holder.itemView.findViewById(R.id.btnmas).setOnClickListener(v -> {
             String idEstablecimiento = establecimiento.getId(); // Usar la clave única
 

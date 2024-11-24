@@ -11,10 +11,10 @@ public class PuntosActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_puntos); // Asegúrate de que este archivo XML exista
+        setContentView(R.layout.activity_puntos);
 
         // Vinculamos el botón con su ID en el layout
-        Button button = findViewById(R.id.mapButton); // Asegúrate de que el ID sea correcto en activity_puntos.xml
+        Button button = findViewById(R.id.mapButton);
 
         // Configuramos el evento click del botón
         button.setOnClickListener(new View.OnClickListener() {

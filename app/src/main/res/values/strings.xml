@@ -11,4 +11,8 @@
     <string name="menu_gallery"></string>
     <string name="menu_slideshow"></string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string-array name="filtros_array">
+        <item>Becas</item>
+        <item>Carreras</item>
+    </string-array>
 </resources>

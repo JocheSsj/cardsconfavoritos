@@ -45,12 +45,12 @@ public class FavoritosAdapter extends RecyclerView.Adapter<FavoritosAdapter.View
                         establecimientoList.add(establecimiento); // Agregar a la lista
                     }
                 }
-                notifyDataSetChanged(); // Notificar cambios al RecyclerView
+                notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Manejar errores si es necesario
+
             }
         });
     }

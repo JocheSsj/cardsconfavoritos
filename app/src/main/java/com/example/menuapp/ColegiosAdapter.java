@@ -50,7 +50,7 @@ public class ColegiosAdapter extends RecyclerView.Adapter<ColegiosAdapter.ViewHo
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        // Manejar errores si es necesario
+
                     }
                 });
     }

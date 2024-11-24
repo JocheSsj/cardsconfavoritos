@@ -83,6 +83,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void agregarMarcadorUnico(double latitud, double longitud, String nombre, String direccion, String idTipoEsta) {
+        LatLng ubicacionSeleccionada = new LatLng(latitud, longitud);
+        int imagenResourceId = seleccionarIcono(idTipoEsta);
+
+        BitmapDescriptor iconoPersonalizado = BitmapDescriptorFactory.fromBitmap(
+                redimensionarImagen(imagenResourceId, 100, 100)
+        );
+
+        mMap.addMarker(new MarkerOptions()
+                .position(ubicacionSeleccionada)
+                .title(nombre)
+                .snippet("Dirección: " + direccion)
+                .icon(iconoPersonalizado));
+
+        // Centrar el mapa en este marcador específico
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ubicacionSeleccionada, 17));
     }
 
     private void configurarBarraBusqueda() {
