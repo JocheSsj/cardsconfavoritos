@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,36 +36,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLngBounds.Builder boundsBuilder;
     private DatabaseReference databaseReference;
     private AutoCompleteTextView autoCompleteTextView;
-    private List<String> nombresEstablecimientos; // Lista para autocompletar nombres
+    private List<String> nombresEstablecimientos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        // Inicializar Firebase y elementos
         databaseReference = FirebaseDatabase.getInstance().getReference("Establecimientos");
+
         nombresEstablecimientos = new ArrayList<>();
 
-        // Configurar el fragmento del mapa
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
+
         }
 
-        // Configurar el AutoCompleteTextView
+        // Configurar el botón de salir
+        ImageButton btnSalirMapa = findViewById(R.id.btnSalirMapa);
+        btnSalirMapa.setOnClickListener(v -> finish()); // Cierra la actividad
         autoCompleteTextView = findViewById(R.id.autoCompleteTextView);
         configurarBarraBusqueda();
-        cargarNombresParaAutoCompletar(); // Cargar nombres de Firebase para autocompletar
+        cargarNombresParaAutoCompletar();
     }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         boundsBuilder = new LatLngBounds.Builder();
 
-        // Verificar datos del Intent
         Intent intent = getIntent();
         double latitud = intent.getDoubleExtra("latitud", 0);
         double longitud = intent.getDoubleExtra("longitud", 0);
@@ -94,8 +97,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    mMap.clear(); // Limpiar el mapa antes de mostrar el lugar
-                    boundsBuilder = new LatLngBounds.Builder(); // Reiniciar boundsBuilder
+                    mMap.clear();
+                    boundsBuilder = new LatLngBounds.Builder();
 
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         double latitud = snapshot.child("latitud").getValue(Double.class);
@@ -104,12 +107,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String idTipoEsta = snapshot.child("idTipoEsta").getValue(String.class);
 
                         agregarMarcadorPersonalizado(latitud, longitud, nombre, direccion, idTipoEsta);
-
-                        // Incluir el marcador en los límites
                         boundsBuilder.include(new LatLng(latitud, longitud));
                     }
 
-                    // Ajustar la cámara para mostrar el marcador único
                     ajustarCamaraATodosLosMarcadores();
                 } else {
                     Toast.makeText(MapsActivity.this, "No se encontró el lugar.", Toast.LENGTH_SHORT).show();
@@ -135,7 +135,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }
 
-                // Configurar el adaptador para el AutoCompleteTextView
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(MapsActivity.this,
                         android.R.layout.simple_dropdown_item_1line, nombresEstablecimientos);
                 autoCompleteTextView.setAdapter(adapter);
@@ -152,8 +151,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                mMap.clear(); // Limpiar el mapa antes de cargar nuevos marcadores
-                boundsBuilder = new LatLngBounds.Builder(); // Reiniciar boundsBuilder
+                mMap.clear();
+                boundsBuilder = new LatLngBounds.Builder();
                 boolean hayMarcadores = false;
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -198,7 +197,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void ajustarCamaraATodosLosMarcadores() {
         if (boundsBuilder != null) {
             LatLngBounds bounds = boundsBuilder.build();
-            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100)); // Margen de 100px
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
         }
     }
 
@@ -217,4 +216,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         return R.drawable.iconouni;
     }
+    @Override
+    public void onBackPressed() {
+        if (mMap != null) {
+            if (boundsBuilder == null || boundsBuilder.build().equals(mMap.getProjection().getVisibleRegion().latLngBounds)) {
+                super.onBackPressed();
+            } else {
+                cargarTodosLosMarcadores();
+            }
+        } else {
+            super.onBackPressed();
+        }
+    }
+
 }

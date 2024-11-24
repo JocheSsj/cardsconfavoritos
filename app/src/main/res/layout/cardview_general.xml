@@ -41,7 +41,7 @@
             android:id="@+id/btnmas"
             android:layout_width="193dp"
             android:layout_height="wrap_content"
-            android:text="vermas" />
+            android:text="Detalles" />
 
         <ImageButton
             android:id="@+id/btnFavorito"

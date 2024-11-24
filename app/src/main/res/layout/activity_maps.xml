@@ -18,6 +18,19 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Fragmento del mapa -->
+    <ImageButton
+        android:id="@+id/btnSalirMapa"
+        android:layout_width="59dp"
+        android:layout_height="22dp"
+        android:layout_margin="8dp"
+        android:layout_marginTop="284dp"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Salir del mapa"
+        android:src="@drawable/salirapp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
