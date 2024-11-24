@@ -4,6 +4,8 @@ public class Establecimiento {
     private String nombre;
     private String direccion;
     private String tipo;
+    private String idTipoEdu;
+    private String tipoEduca;
     private String descripcion;
     private int favorito;
 
@@ -13,6 +15,8 @@ public class Establecimiento {
         this.nombre = nombre;
         this.direccion = direccion;
         this.tipo = tipo;
+        this.idTipoEdu = idTipoEdu;
+        this.tipoEduca = tipoEduca;
         this.descripcion = descripcion;
         this.favorito = favorito;
     }
@@ -48,6 +52,14 @@ public class Establecimiento {
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
+    public String getIdTipoEdu() {
+        return idTipoEdu;
+    }
+
+
+    public void setIdTipoEdu(String idTipoEdu) {
+        this.idTipoEdu = idTipoEdu;
+    }
 
     public String getDescripcion() {
         return descripcion;
@@ -56,6 +68,7 @@ public class Establecimiento {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
+
 
     public int getFavorito() {
         return favorito;

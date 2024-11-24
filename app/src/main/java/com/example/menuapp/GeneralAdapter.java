@@ -2,6 +2,7 @@ package com.example.menuapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,15 +25,18 @@ import java.util.List;
 public class GeneralAdapter extends RecyclerView.Adapter<GeneralAdapter.ViewHolder> {
 
     private List<Establecimiento> establecimientoList;
+    private List<Establecimiento> establecimientoListFiltrada; // Lista para filtrar
     private DatabaseReference databaseReference;
     private Context context;
 
-    public GeneralAdapter() {
+    public GeneralAdapter(Context context) {
         this.context = context;
         this.establecimientoList = new ArrayList<>();
+        this.establecimientoListFiltrada = new ArrayList<>(); // Inicializar lista filtrada
         this.databaseReference = FirebaseDatabase.getInstance().getReference("Establecimientos");
         cargarDatosDesdeFirebase();
     }
+
     private void cargarDatosDesdeFirebase() {
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -40,11 +44,13 @@ public class GeneralAdapter extends RecyclerView.Adapter<GeneralAdapter.ViewHold
                 establecimientoList.clear(); // Limpiar lista antes de agregar nuevos datos
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Establecimiento establecimiento = dataSnapshot.getValue(Establecimiento.class); // Convertir nodo en objeto Establecimiento
-                    if (establecimiento != null) { // Verificar que no sea nulo
+                    if (establecimiento != null) {
                         establecimiento.setId(dataSnapshot.getKey()); // Asignar la clave única al objeto
                         establecimientoList.add(establecimiento); // Agregar a la lista
                     }
                 }
+                establecimientoListFiltrada.clear();
+                establecimientoListFiltrada.addAll(establecimientoList); // Mostrar todos los datos por defecto
                 notifyDataSetChanged(); // Notificar cambios al RecyclerView
             }
 
@@ -53,9 +59,35 @@ public class GeneralAdapter extends RecyclerView.Adapter<GeneralAdapter.ViewHold
                 // Manejar errores si es necesario
             }
         });
-
     }
 
+    // Método para filtrar por tipo de establecimiento
+    public void filtrarPorTipo(String tipo) {
+        establecimientoListFiltrada.clear(); // Limpiar la lista filtrada
+        for (Establecimiento establecimiento : establecimientoList) {
+            if (establecimiento.getIdTipoEdu() != null && establecimiento.getIdTipoEdu().equals(tipo)) {
+                establecimientoListFiltrada.add(establecimiento); // Agregar los que coincidan con el filtro
+            }
+        }
+
+
+        // Log para depurar la cantidad de elementos filtrados
+        Log.d("GeneralAdapter", "Filtrados " + establecimientoListFiltrada.size() + " elementos para tipo: " + tipo);
+
+        if (establecimientoListFiltrada.isEmpty()) {
+            Log.e("GeneralAdapter", "No se encontraron establecimientos para el tipo: " + tipo);
+        }
+
+        notifyDataSetChanged(); // Actualizar el RecyclerView
+    }
+    public void restablecerFiltro() {
+        establecimientoListFiltrada.clear();
+        establecimientoListFiltrada.addAll(establecimientoList); // Copiar todos los datos originales
+        notifyDataSetChanged(); // Notificar cambios al RecyclerView
+
+        // Log para depuración
+        Log.d("GeneralAdapter", "Filtro restablecido. Mostrando " + establecimientoListFiltrada.size() + " elementos.");
+    }
 
 
 
@@ -69,14 +101,12 @@ public class GeneralAdapter extends RecyclerView.Adapter<GeneralAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Establecimiento establecimiento = establecimientoList.get(position);
+        Establecimiento establecimiento = establecimientoListFiltrada.get(position);
 
         // Configurar los datos
         holder.tvNombre.setText(establecimiento.getNombre());
         holder.tvDireccion.setText(establecimiento.getDireccion());
         holder.tvDescripcion.setText(establecimiento.getDescripcion());
-
-        // Cargar imagen usando Glide
 
         // Configurar el botón favorito
         holder.btnFavorito.setImageResource(
@@ -96,7 +126,7 @@ public class GeneralAdapter extends RecyclerView.Adapter<GeneralAdapter.ViewHold
             databaseReference.child(establecimiento.getId()).child("favorito").setValue(establecimiento.getFavorito());
         });
         holder.itemView.findViewById(R.id.btnmas).setOnClickListener(v -> {
-            String idEstablecimiento = establecimiento.getId(); // Usar la clave única
+            String idEstablecimiento = establecimiento.getId();
 
             // Iniciar la actividad Detalles y enviar el ID del establecimiento
             Intent intent = new Intent(holder.itemView.getContext(), Detalles.class);
@@ -107,7 +137,7 @@ public class GeneralAdapter extends RecyclerView.Adapter<GeneralAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return establecimientoList.size();
+        return establecimientoListFiltrada.size(); // Usar la lista filtrada
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

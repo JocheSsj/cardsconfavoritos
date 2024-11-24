@@ -7,6 +7,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,30 +26,45 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private LatLngBounds.Builder boundsBuilder; // Para ajustar el zoom a todos los marcadores
+    private LatLngBounds.Builder boundsBuilder;
+    private DatabaseReference databaseReference;
+    private AutoCompleteTextView autoCompleteTextView;
+    private List<String> nombresEstablecimientos; // Lista para autocompletar nombres
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        // Obtener el fragmento del mapa
+        // Inicializar Firebase y elementos
+        databaseReference = FirebaseDatabase.getInstance().getReference("Establecimientos");
+        nombresEstablecimientos = new ArrayList<>();
+
+        // Configurar el fragmento del mapa
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+
+        // Configurar el AutoCompleteTextView
+        autoCompleteTextView = findViewById(R.id.autoCompleteTextView);
+        configurarBarraBusqueda();
+        cargarNombresParaAutoCompletar(); // Cargar nombres de Firebase para autocompletar
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        boundsBuilder = new LatLngBounds.Builder(); // Inicializar el objeto para los límites
+        boundsBuilder = new LatLngBounds.Builder();
 
-        // Verificar si hay datos del intent para un marcador único
+        // Verificar datos del Intent
         Intent intent = getIntent();
         double latitud = intent.getDoubleExtra("latitud", 0);
         double longitud = intent.getDoubleExtra("longitud", 0);
@@ -55,84 +73,115 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String idTipoEsta = intent.getStringExtra("idTipoEsta");
 
         if (latitud != 0 && longitud != 0) {
-            // Agregar un marcador único y centrar el mapa en él
             agregarMarcadorUnico(latitud, longitud, nombre, direccion, idTipoEsta);
         } else {
-            // Cargar todos los marcadores y ajustar la cámara
             cargarTodosLosMarcadores();
         }
     }
 
-    /**
-     * Método para agregar un marcador único basado en los datos enviados desde otra actividad.
-     */
     private void agregarMarcadorUnico(double latitud, double longitud, String nombre, String direccion, String idTipoEsta) {
-        LatLng ubicacionSeleccionada = new LatLng(latitud, longitud);
-
-        // Seleccionar la imagen del marcador según idTipoEsta
-        int imagenResourceId = seleccionarIcono(idTipoEsta);
-
-        BitmapDescriptor iconoPersonalizado = BitmapDescriptorFactory.fromBitmap(
-                redimensionarImagen(imagenResourceId, 100, 100)
-        );
-
-        mMap.addMarker(new MarkerOptions()
-                .position(ubicacionSeleccionada)
-                .title(nombre)
-                .snippet("Dirección: " + direccion)
-                .icon(iconoPersonalizado));
-
-        // Centrar el mapa en este marcador
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ubicacionSeleccionada, 17));
     }
 
-    /**
-     * Método para cargar todos los marcadores desde Firebase.
-     */
-    private void cargarTodosLosMarcadores() {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Establecimientos");
+    private void configurarBarraBusqueda() {
+        autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
+            String nombreSeleccionado = (String) parent.getItemAtPosition(position);
+            buscarYMostrarLugar(nombreSeleccionado);
+        });
+    }
+
+    private void buscarYMostrarLugar(String nombre) {
+        databaseReference.orderByChild("nombre").equalTo(nombre).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    mMap.clear(); // Limpiar el mapa antes de mostrar el lugar
+                    boundsBuilder = new LatLngBounds.Builder(); // Reiniciar boundsBuilder
+
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        double latitud = snapshot.child("latitud").getValue(Double.class);
+                        double longitud = snapshot.child("longitud").getValue(Double.class);
+                        String direccion = snapshot.child("direccion").getValue(String.class);
+                        String idTipoEsta = snapshot.child("idTipoEsta").getValue(String.class);
+
+                        agregarMarcadorPersonalizado(latitud, longitud, nombre, direccion, idTipoEsta);
+
+                        // Incluir el marcador en los límites
+                        boundsBuilder.include(new LatLng(latitud, longitud));
+                    }
+
+                    // Ajustar la cámara para mostrar el marcador único
+                    ajustarCamaraATodosLosMarcadores();
+                } else {
+                    Toast.makeText(MapsActivity.this, "No se encontró el lugar.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(MapsActivity.this, "Error al buscar el lugar.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void cargarNombresParaAutoCompletar() {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                nombresEstablecimientos.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String nombre = snapshot.child("nombre").getValue(String.class);
+                    if (nombre != null) {
+                        nombresEstablecimientos.add(nombre);
+                    }
+                }
+
+                // Configurar el adaptador para el AutoCompleteTextView
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(MapsActivity.this,
+                        android.R.layout.simple_dropdown_item_1line, nombresEstablecimientos);
+                autoCompleteTextView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("Firebase", "Error al cargar nombres: " + databaseError.getMessage());
+            }
+        });
+    }
+
+    private void cargarTodosLosMarcadores() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mMap.clear(); // Limpiar el mapa antes de cargar nuevos marcadores
+                boundsBuilder = new LatLngBounds.Builder(); // Reiniciar boundsBuilder
                 boolean hayMarcadores = false;
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    // Obtener datos del establecimiento
                     double latitud = snapshot.child("latitud").getValue(Double.class);
                     double longitud = snapshot.child("longitud").getValue(Double.class);
                     String nombre = snapshot.child("nombre").getValue(String.class);
                     String direccion = snapshot.child("direccion").getValue(String.class);
                     String idTipoEsta = snapshot.child("idTipoEsta").getValue(String.class);
 
-                    // Agregar marcador al mapa
-                    agregarMarcador(latitud, longitud, nombre, direccion, idTipoEsta);
-
-                    // Incluir el marcador en los límites
+                    agregarMarcadorPersonalizado(latitud, longitud, nombre, direccion, idTipoEsta);
                     boundsBuilder.include(new LatLng(latitud, longitud));
                     hayMarcadores = true;
                 }
 
-                // Ajustar la cámara para mostrar todos los marcadores solo si no se centró en un marcador único
                 if (hayMarcadores) {
-                    LatLngBounds bounds = boundsBuilder.build();
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100)); // Margen de 100px
+                    ajustarCamaraATodosLosMarcadores();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("Firebase", "Error al cargar los datos: " + databaseError.getMessage());
+                Log.e("Firebase", "Error al cargar datos: " + databaseError.getMessage());
             }
         });
     }
 
-    /**
-     * Método para agregar un marcador genérico.
-     */
-    private void agregarMarcador(double latitud, double longitud, String nombre, String direccion, String idTipoEsta) {
+    private void agregarMarcadorPersonalizado(double latitud, double longitud, String nombre, String direccion, String idTipoEsta) {
         LatLng ubicacion = new LatLng(latitud, longitud);
-
-        // Seleccionar la imagen del marcador según idTipoEsta
         int imagenResourceId = seleccionarIcono(idTipoEsta);
 
         BitmapDescriptor iconoPersonalizado = BitmapDescriptorFactory.fromBitmap(
@@ -146,17 +195,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .icon(iconoPersonalizado));
     }
 
-    /**
-     * Método para redimensionar una imagen desde drawable.
-     */
+    private void ajustarCamaraATodosLosMarcadores() {
+        if (boundsBuilder != null) {
+            LatLngBounds bounds = boundsBuilder.build();
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100)); // Margen de 100px
+        }
+    }
+
     private Bitmap redimensionarImagen(int resourceId, int ancho, int alto) {
         Bitmap imagenOriginal = BitmapFactory.decodeResource(getResources(), resourceId);
         return Bitmap.createScaledBitmap(imagenOriginal, ancho, alto, false);
     }
 
-    /**
-     * Método para seleccionar el ícono del marcador según el tipo de establecimiento.
-     */
     private int seleccionarIcono(String idTipoEsta) {
         if ("Universidad".equalsIgnoreCase(idTipoEsta)) {
             return R.drawable.unimarket;
@@ -165,6 +215,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else if ("Colegio".equalsIgnoreCase(idTipoEsta)) {
             return R.drawable.colegiomarket;
         }
-        return R.drawable.iconouni; // Icono predeterminado
+        return R.drawable.iconouni;
     }
 }
